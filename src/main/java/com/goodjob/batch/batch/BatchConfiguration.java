@@ -26,7 +26,9 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.io.IOException;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 
 
 @Configuration
@@ -42,7 +44,7 @@ public class BatchConfiguration {
     @Bean
     public TaskExecutor taskExecutor() {
         SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-        taskExecutor.setConcurrencyLimit(8);
+        taskExecutor.setConcurrencyLimit(10);
         return taskExecutor;
     }
 
@@ -62,18 +64,13 @@ public class BatchConfiguration {
         Flow wontedFullStack = new FlowBuilder<SimpleFlow>("wontedFullStack")
                 .start(step4(jobRepository))
                 .build();
-//        Flow db = new FlowBuilder<SimpleFlow>("db작업")
-//                .start(step5(jobRepository))
-//                .next(step6(jobRepository))
-//                .next(step7(jobRepository))
-//                .build();
+
 
 
         return new JobBuilder("job1", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(saramin)
                 .split(taskExecutor()).add(wontedBack, wontedFront, wontedFullStack)
-//                .next(db)
                 .end()
                 .build();
     }

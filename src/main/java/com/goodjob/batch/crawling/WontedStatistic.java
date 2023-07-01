@@ -11,6 +11,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -116,8 +117,8 @@ public class WontedStatistic {
 
         List<WebElement> webElements = driver.findElements(By.className("Card_className__u5rsb"));
         List<JobCheckDto> checkDtos = new ArrayList<>();
-
-        for (int i = 1; i < webElements.size(); i++) {
+        int listSize = webElements.size();
+        for (int i = 1; i < listSize; i++) {
             try {
                 WebElement webElement = webElements.get(i);
 
@@ -133,13 +134,12 @@ public class WontedStatistic {
             }
 
         }
-        for (JobCheckDto checkDto : checkDtos) {
-            detailPage(driver,checkDto);
-        }
         driver.quit();
+        for (JobCheckDto checkDto : checkDtos) {
+            detailPage(checkDto);
+        }
     }
 
-    @Async
     public CompletableFuture<WebDriver> setDriver() throws InterruptedException, IOException {
         String os = System.getProperty("os.name").toLowerCase();
 
@@ -153,57 +153,52 @@ public class WontedStatistic {
             System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
         }
         ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--headless=new");
-        chromeOptions.addArguments("--no-sandbox");
-        chromeOptions.addArguments("--disable-dev-shm-usage");
-        chromeOptions.addArguments("--disable-gpu");
+        //TODO: chrome option 수정 테스트
+//        chromeOptions.addArguments("--headless=new");
+//        chromeOptions.addArguments("--no-sandbox");
+//        chromeOptions.addArguments("--disable-dev-shm-usage");
+//        chromeOptions.addArguments("--disable-gpu");
+
+        chromeOptions.addArguments("headless", "disable-gpu", "window-size=1920x1080",
+                "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
+        );
         return CompletableFuture.supplyAsync(() -> new ChromeDriver(chromeOptions));
-//        return CompletableFuture.completedFuture(new ChromeDriver(chromeOptions));
+//        return CompletableFuture.completedFuture(new ChromeDriver(chromeOptions)); TODO: 삭제 예정
     }
 
-    @Async
-    public void scrollDown(WebDriver driver, String placeXpath, String deadLineXpath) {
+
+    public void scrollDown(WebDriver driver) {
+        WebElement element = driver.findElement(By.className("JobDescription_JobDescription__VWfcb"));
+        WebDriverWait wait1 = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait1.until(ExpectedConditions.visibilityOfElementLocated(By.className("JobDescription_JobDescription__VWfcb")));
+
         JavascriptExecutor js = (JavascriptExecutor) driver;
-        int cnt = 0;
-        while (true) {
-            //현재 높이 저장
-            try {
-                Long lastHeight = (Long) js.executeScript("return document.body.scrollHeight");
-
-
-                // 스크롤
-                js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
-
-                // 새로운 내용이 로드될 때까지 대기
-                Thread.sleep(2000);
-
-                // 새로운 높이를 얻음
-                Long newHeight = (Long) js.executeScript("return document.body.scrollHeight");
-
-                ExpectedCondition<WebElement> place = ExpectedConditions.visibilityOfElementLocated(By.xpath(placeXpath));
-                ExpectedCondition<WebElement> deadLine = ExpectedConditions.visibilityOfElementLocated(By.xpath(deadLineXpath));
-                if (newHeight.equals(lastHeight) || (place.apply(driver) != null && deadLine.apply(driver) != null)) {
-                    break;
-                }
-            } catch (InterruptedException e) {
-                cnt++;
-                if (cnt > 100) {
-                    log.error("detail scroll error" + e.getMessage());
-                    break;
-                }
-            }
-        }
+        js.executeScript("arguments[0].scrollIntoView({block: 'end', behavior: 'auto'});", element);
+        js.executeScript("window.scrollBy(0, window.innerHeight);");
     }
 
     @Async
-    public void detailPage(WebDriver driver, JobCheckDto checkDto) throws ExecutionException, InterruptedException, IOException {
+    public void detailPage(JobCheckDto checkDto) throws ExecutionException, InterruptedException, IOException {
+        WebDriver driver = setDriver().get();
         driver.get(checkDto.url());
-        scrollDown(driver, "//*[@id=\"__next\"]/div[3]/div[1]/div[1]/div[1]/div[2]/section[2]/div[2]/span[2]", "//*[@id=\"__next\"]/div[3]/div[1]/div[1]/div[1]/div[2]/section[2]/div[1]/span[2]");
-        String place = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[3]/div[1]/div[1]/div[1]/div[2]/section[2]/div[2]/span[2]")).getText();
-        String deadLine = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[3]/div[1]/div[1]/div[1]/div[2]/section[2]/div[1]/span[2]")).getText();
+        try {
+            scrollDown(driver);
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+        WebDriverWait wait2 = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement deadlineElement = wait2.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"__next\"]/div[3]/div[1]/div[1]/div/div[2]/section[2]/div[1]/span[2]")));
+        WebElement workingAreaElement = wait2.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"__next\"]/div[3]/div[1]/div[1]/div/div[2]/section[2]/div[2]/span[2]")));
+
+        // 웹 요소로부터 텍스트 추출
+        String deadLine = deadlineElement.getText();
+        String place = workingAreaElement.getText();
+        log.debug("{}", deadLine);
+        log.debug("{}", place);
         JobResponseDto jobResponseDto = new JobResponseDto(checkDto.company(), checkDto.subject(), checkDto.url(), checkDto.sector(), checkDto.sectorCode(), checkDto.createDate(), deadLine, checkDto.career(), place);
-//        jobResponseDtos.add(jobResponseDto);
+
         producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
+        driver.quit();
     }
 }
 
