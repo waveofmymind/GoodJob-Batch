@@ -48,7 +48,6 @@ public class BatchConfiguration {
         return taskExecutor;
     }
 
-    // 병렬처리 고민
     @Bean
     public Job job1(JobRepository jobRepository) {
         Flow saramin = new FlowBuilder<SimpleFlow>("saramin")
