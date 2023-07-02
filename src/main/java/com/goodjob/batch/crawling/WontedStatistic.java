@@ -149,10 +149,10 @@ public class WontedStatistic {
 
         ChromeOptions chromeOptions = new ChromeOptions();
 
-        chromeOptions.addArguments("headless", "disable-gpu", "window-size=1920x1080",
-                "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
-                "blink-settings=imagesEnabled=false"
-        );
+        chromeOptions.addArguments("--headless=new");
+        chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments("--disable-dev-shm-usage");
+        chromeOptions.addArguments("--disable-gpu");
         return CompletableFuture.supplyAsync(() -> new ChromeDriver(chromeOptions));
     }
 
