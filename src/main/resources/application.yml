@@ -39,3 +39,23 @@ accessKey:
 jasypt:
   encryptor:
     password: ${JASYPT_PASSWORD}
+
+
+management:
+  info:
+    java:
+      enabled: true
+    os:
+      enabled: true
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-components: always
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus,health,info,metrics"
+  metrics:
+    tags:
+      application: ${spring.application.name}
