@@ -44,7 +44,7 @@ public class BatchConfiguration {
     @Bean
     public TaskExecutor taskExecutor() {
         SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-        taskExecutor.setConcurrencyLimit(10);
+        taskExecutor.setConcurrencyLimit(4);
         return taskExecutor;
     }
 
@@ -177,6 +177,8 @@ public class BatchConfiguration {
             return RepeatStatus.FINISHED;
         };
     }
+
+
 
 
 //    @Bean

@@ -1,16 +1,17 @@
 package com.goodjob.batch.crawling;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goodjob.batch.batch.BatchProducer;
 import com.goodjob.batch.dto.JobCheckDto;
 import com.goodjob.batch.dto.JobResponseDto;
-import com.sun.istack.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.openqa.selenium.*;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.scheduling.annotation.Async;
@@ -22,10 +23,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.*;
 
 import static com.goodjob.batch.Constants.*;
 
@@ -39,7 +37,7 @@ public class WontedStatistic {
     private final ObjectMapper objectMapper;
 
     //TODO: 쓰레드풀 생성하여 드라이버 관리 확인
-    private static ConcurrentLinkedQueue<WebDriver> driverPool;
+//    private static ConcurrentLinkedQueue<WebDriver> driverPool;
 
     /**
      * @param jobCode 프론트 669, 백엔드 872, 풀스택(웹개발) 873
@@ -49,6 +47,10 @@ public class WontedStatistic {
      */
 //    @Async
     public void crawlWebsite(int jobCode, int career) throws InterruptedException, IOException, WebDriverException, ExecutionException {
+//        ExecutorService executorService = Executors.newFixedThreadPool(20);
+//        setDriverPool();
+//        WebDriver driver = getDriverFromPool(); TODO: 추후 쓰레드풀 조정 하여 성능개선
+
         String company; //회사명
         String subject; // 제목
         String url; // url
@@ -129,6 +131,7 @@ public class WontedStatistic {
 
         }
         driver.quit();
+
         System.out.println(checkDtos.size() + "개의 채용공고가 있습니다.");
         for (JobCheckDto checkDto : checkDtos) {
             detailPage(checkDto);
@@ -202,27 +205,29 @@ public class WontedStatistic {
      * driver pool 관리
      * TODO: 확인 후 성능 비교
      */
+//    private static void initializeDriverPool() {
+//        for (int i = 0; i < 30; i++) {
+//            ChromeOptions chromeOptions = new ChromeOptions();
+//
+//            chromeOptions.addArguments("--headless=new");
+//            chromeOptions.addArguments("--no-sandbox");
+//            chromeOptions.addArguments("--disable-dev-shm-usage");
+//            chromeOptions.addArguments("--disable-gpu");
+//            WebDriver driver = new ChromeDriver(chromeOptions);
+//            driverPool.add(driver);
+//        }
+//    }
 
+//    @Async
+//    public void setDriverPool() {
+//        initializeDriverPool();
+//    }
 
-    private static void initializeDriverPool(int size) {
-        driverPool = new ConcurrentLinkedQueue<>();
-
-        for (int i = 0; i < size; i++) {
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("headless", "disable-gpu", "window-size=1920x1080",
-                    "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
-                    "blink-settings=imagesEnabled=false"
-            );
-            WebDriver driver = new ChromeDriver(options);
-            driverPool.add(driver);
-        }
-    }
-
-    private static WebDriver getDriverFromPool() {
-        return driverPool.poll();
-    }
-
-    private static void returnDriverToPool(WebDriver driver) {
-        driverPool.add(driver);
-    }
+//    private static WebDriver getDriverFromPool() {
+//        return driverPool.poll();
+//    }
+//
+//    private static void returnDriverToPool(WebDriver driver) {
+//        driverPool.add(driver);
+//    }
 }

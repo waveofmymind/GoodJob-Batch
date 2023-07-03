@@ -31,7 +31,7 @@ spring:
 
 scheduler:
   cron:
-    job: "0 0 0/1 * * *"
+    job: "0 0 3/12 * * *"
 
 accessKey:
   saramin: ENC(vAiGCHWxA7xlfVU04DkiksG8V05r4NKVzDoqYA8WbkmF7O6g6pZ/RxidyvQ4YppZd9suBjOz0lHSBVSFQ0NqkA==)
@@ -39,3 +39,23 @@ accessKey:
 jasypt:
   encryptor:
     password: ${JASYPT_PASSWORD}
+
+
+management:
+  info:
+    java:
+      enabled: true
+    os:
+      enabled: true
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-components: always
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus,health,info,metrics"
+  metrics:
+    tags:
+      application: ${spring.application.name}
