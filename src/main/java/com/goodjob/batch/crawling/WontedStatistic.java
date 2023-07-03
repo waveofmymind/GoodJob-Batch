@@ -39,7 +39,7 @@ public class WontedStatistic {
     private final ObjectMapper objectMapper;
 
     //TODO: 쓰레드풀 생성하여 드라이버 관리 확인
-//    private static ConcurrentLinkedQueue<WebDriver> webDriverQueue;
+    private static ConcurrentLinkedQueue<WebDriver> driverPool;
 
     /**
      * @param jobCode 프론트 669, 백엔드 872, 풀스택(웹개발) 873
@@ -129,6 +129,7 @@ public class WontedStatistic {
 
         }
         driver.quit();
+        System.out.println(checkDtos.size() + "개의 채용공고가 있습니다.");
         for (JobCheckDto checkDto : checkDtos) {
             detailPage(checkDto);
         }
@@ -192,8 +193,36 @@ public class WontedStatistic {
                 checkDto.sector(), checkDto.sectorCode(), checkDto.createDate(),
                 deadLine, checkDto.career(), place
                 );
-
         producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
         driver.quit();
+    }
+
+
+    /**
+     * driver pool 관리
+     * TODO: 확인 후 성능 비교
+     */
+
+
+    private static void initializeDriverPool(int size) {
+        driverPool = new ConcurrentLinkedQueue<>();
+
+        for (int i = 0; i < size; i++) {
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("headless", "disable-gpu", "window-size=1920x1080",
+                    "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
+                    "blink-settings=imagesEnabled=false"
+            );
+            WebDriver driver = new ChromeDriver(options);
+            driverPool.add(driver);
+        }
+    }
+
+    private static WebDriver getDriverFromPool() {
+        return driverPool.poll();
+    }
+
+    private static void returnDriverToPool(WebDriver driver) {
+        driverPool.add(driver);
     }
 }
