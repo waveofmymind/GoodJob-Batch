@@ -4,7 +4,7 @@ spring:
   kafka:
     bootstrap-servers: ENC(FOPXKkmokR4Ms+fA/Z1xUyn+bPC2MKAtnto16KEgZjzM1DSxTt8Yr44mWiCRARyVlmgjEz5rZP0OVI9uWgPWpQ==)
     consumer:
-      group-id: gptgroup
+      group-id: jobgroup
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
