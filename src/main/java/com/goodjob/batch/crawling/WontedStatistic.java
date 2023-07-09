@@ -94,7 +94,7 @@ public class WontedStatistic {
             } catch (InterruptedException e) {
                 errorCnt++;
                 if (errorCnt > 100) {
-                    driver.quit();
+                    driver.close();
                     throw new CrawlingException("메인페이지 스크롤 에러");
                 }
             }
@@ -132,7 +132,7 @@ public class WontedStatistic {
             }
 
         }
-        driver.quit();
+        driver.close();
 
         System.out.println(checkDtos.size() + "개의 채용공고가 있습니다.");
         for (JobCheckDto checkDto : checkDtos) {
@@ -181,7 +181,7 @@ public class WontedStatistic {
             scrollDown(driver);
         }catch (Exception e){
             e.printStackTrace();
-            driver.quit();
+            driver.close();
             throw new CrawlingException("detailPage 스크롤 에러");
         }
         WebDriverWait xpathWait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -201,7 +201,7 @@ public class WontedStatistic {
                 deadLine, checkDto.career(), place
                 );
         producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
-        driver.quit();
+        driver.close();
     }
 
 
