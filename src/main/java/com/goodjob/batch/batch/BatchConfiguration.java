@@ -1,7 +1,6 @@
 package com.goodjob.batch.batch;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goodjob.batch.api.SaraminApiManager;
 import com.goodjob.batch.crawling.WontedStatistic;
 import com.goodjob.batch.exception.CrawlingException;
@@ -38,10 +37,9 @@ import java.util.concurrent.ExecutorService;
 public class BatchConfiguration {
     private final PlatformTransactionManager transactionManager;
 
-    private final BatchProducer producer;
+    private final SaraminApiManager saraminApiManager;
 
-    private final ObjectMapper mapper;
-
+    private final WontedStatistic wontedStatistic;
     @Bean
     public TaskExecutor taskExecutor() {
         SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
@@ -187,8 +185,6 @@ public class BatchConfiguration {
             return RepeatStatus.FINISHED;
         };
     }
-
-
 
 
 //    @Bean

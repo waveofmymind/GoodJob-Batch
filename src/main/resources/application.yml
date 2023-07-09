@@ -4,7 +4,7 @@ spring:
   kafka:
     bootstrap-servers: ENC(Ye8D/K+6VCjeDv84YdExrcYV6cBySzV/hclr2AcjvVbA7ZPip4KYbjxbkxJIZH6m8p6Ssgd2uJm25UkethFn2g==)
     consumer:
-      group-id: gptgroup
+      group-id: jobgroup
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -55,7 +55,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "prometheus,health,info,metrics"
+        include: "prometheus,health,info,metrics,heapdump"
   metrics:
     tags:
       application: ${spring.application.name}

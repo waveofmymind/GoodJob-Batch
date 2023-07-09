@@ -214,7 +214,6 @@ public class WontedStatistic {
         } finally {
             driver.quit();
         }
-
     }
 
 

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BatchProducer {
 
-    private static final String topic = "job";
+    private static final String topic = "job-prod";
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 
