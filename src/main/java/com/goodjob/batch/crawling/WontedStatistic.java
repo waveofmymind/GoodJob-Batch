@@ -170,7 +170,7 @@ public class WontedStatistic {
     }
 
 
-    private void scrollDown(WebDriver driver) throws TimeoutException, NoSuchElementException{
+    private void scrollDown(WebDriver driver) throws TimeoutException, NoSuchElementException {
         WebElement element = driver.findElement(By.className("JobDescription_JobDescription__VWfcb"));
         WebDriverWait wait1 = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait1.until(ExpectedConditions.visibilityOfElementLocated(By.className("JobDescription_JobDescription__VWfcb")));
@@ -211,7 +211,6 @@ public class WontedStatistic {
         }finally {
             driver.quit();
         }
-
     }
 
 
