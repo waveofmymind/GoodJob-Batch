@@ -6,6 +6,7 @@ import com.goodjob.batch.batch.BatchProducer;
 import com.goodjob.batch.dto.JobCheckDto;
 import com.goodjob.batch.dto.JobResponseDto;
 import com.goodjob.batch.exception.CrawlingException;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
@@ -135,7 +136,6 @@ public class WontedStatistic {
         }
         driver.quit();
 
-        System.out.println(checkDtos.size() + "개의 채용공고가 있습니다.");
         for (JobCheckDto checkDto : checkDtos) {
             try {
                 detailPage(checkDto);
@@ -182,8 +182,8 @@ public class WontedStatistic {
 
     @Async
     public void detailPage(JobCheckDto checkDto) throws ExecutionException, InterruptedException, IOException {
-            WebDriver driver = setDriver().get();
-            driver.get(checkDto.url());
+        WebDriver driver = setDriver().get();
+        driver.get(checkDto.url());
 
         try {
             scrollDown(driver);
@@ -203,12 +203,15 @@ public class WontedStatistic {
                             checkDto.sector(), checkDto.sectorCode(), checkDto.createDate(),
                             deadLine, checkDto.career(), place
                     );
-            System.out.println(jobResponseDto.getUrl());
-        producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
-        }catch (Exception e){
+            try {
+                producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
+            }catch (Exception e){
+                log.error("Kafka Producer Error");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             throw new CrawlingException("detailPage 스크롤 에러");
-        }finally {
+        } finally {
             driver.quit();
         }
     }
