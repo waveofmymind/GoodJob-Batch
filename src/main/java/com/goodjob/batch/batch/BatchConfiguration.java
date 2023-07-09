@@ -1,11 +1,13 @@
 package com.goodjob.batch.batch;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goodjob.batch.api.SaraminApiManager;
 import com.goodjob.batch.crawling.WontedStatistic;
 import com.goodjob.batch.exception.CrawlingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.openqa.selenium.WebDriverException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -36,10 +38,8 @@ import java.util.concurrent.ExecutorService;
 @RequiredArgsConstructor
 public class BatchConfiguration {
     private final PlatformTransactionManager transactionManager;
-
-    private final SaraminApiManager saraminApiManager;
-
-    private final WontedStatistic wontedStatistic;
+    private final ObjectMapper mapper;
+    private final BatchProducer producer;
     @Bean
     public TaskExecutor taskExecutor() {
         SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
