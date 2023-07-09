@@ -95,7 +95,7 @@ public class WontedStatistic {
             } catch (InterruptedException e) {
                 errorCnt++;
                 if (errorCnt > 100) {
-                    driver.close();
+                    driver.quit();
                     throw new CrawlingException("메인페이지 스크롤 에러");
                 }
             }
@@ -133,7 +133,7 @@ public class WontedStatistic {
             }
 
         }
-        driver.close();
+        driver.quit();
 
         System.out.println(checkDtos.size() + "개의 채용공고가 있습니다.");
         for (JobCheckDto checkDto : checkDtos) {
@@ -160,6 +160,8 @@ public class WontedStatistic {
 
         ChromeOptions chromeOptions = new ChromeOptions();
 
+        chromeOptions.addArguments("--disk-cache-size=0");
+        chromeOptions.addArguments("--media-cache-size=0");
         chromeOptions.addArguments("--headless=new");
         chromeOptions.addArguments("--no-sandbox");
         chromeOptions.addArguments("--disable-dev-shm-usage");
@@ -202,12 +204,12 @@ public class WontedStatistic {
                             deadLine, checkDto.career(), place
                     );
             System.out.println(jobResponseDto.getUrl());
-//        producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
+        producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
         }catch (Exception e){
             e.printStackTrace();
             throw new CrawlingException("detailPage 스크롤 에러");
         }finally {
-            driver.close();
+            driver.quit();
         }
 
     }
