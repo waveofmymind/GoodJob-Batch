@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goodjob.batch.batch.BatchProducer;
 import com.goodjob.batch.dto.JobCheckDto;
 import com.goodjob.batch.dto.JobResponseDto;
+import com.goodjob.batch.exception.CrawlingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
@@ -93,7 +94,8 @@ public class WontedStatistic {
             } catch (InterruptedException e) {
                 errorCnt++;
                 if (errorCnt > 100) {
-                    break;
+                    driver.quit();
+                    throw new CrawlingException("메인페이지 스크롤 에러");
                 }
             }
         }
@@ -179,6 +181,8 @@ public class WontedStatistic {
             scrollDown(driver);
         }catch (Exception e){
             e.printStackTrace();
+            driver.quit();
+            throw new CrawlingException("detailPage 스크롤 에러");
         }
         WebDriverWait xpathWait = new WebDriverWait(driver, Duration.ofSeconds(10));
         WebElement deadlineElement = xpathWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"__next\"]/div[3]/div[1]/div[1]/div/div[2]/section[2]/div[1]/span[2]")));
@@ -196,6 +200,7 @@ public class WontedStatistic {
                 checkDto.sector(), checkDto.sectorCode(), checkDto.createDate(),
                 deadLine, checkDto.career(), place
                 );
+        System.out.println(jobResponseDto.getUrl());
         producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
         driver.quit();
     }
