@@ -90,13 +90,14 @@ public class SaraminApiManager {
                 }
                 int career = job.getPosition().getExperienceLevel().getCareer();
                 JobResponseDto jobResponseDto = new JobResponseDto(company, subject, url, sector, sectorCode, createDate, deadLine, career, place);
-                producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
+//                producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
             }
         } catch (NullPointerException e) {
             log.error("키 만료 or 주소 바뀜");
-        } catch (JsonProcessingException e) {
-            log.error("json 변환 실패");
         }
+//        } catch (JsonProcessingException e) {
+//            log.error("json 변환 실패");
+//        }
     }
 
 }

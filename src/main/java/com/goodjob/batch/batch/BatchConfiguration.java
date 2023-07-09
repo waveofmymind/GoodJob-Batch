@@ -4,6 +4,7 @@ package com.goodjob.batch.batch;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goodjob.batch.api.SaraminApiManager;
 import com.goodjob.batch.crawling.WontedStatistic;
+import com.goodjob.batch.exception.CrawlingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriverException;
@@ -119,7 +120,10 @@ public class BatchConfiguration {
             for (int i = 0; i < 10; i++) {
                 try {
                     wontedStatistic.crawlWebsite(back, i);
-                }  catch (IOException | InterruptedException | WebDriverException | ExecutionException e) {
+                }  catch (IOException | InterruptedException |
+                          WebDriverException | ExecutionException |
+                          CrawlingException e)
+                {
                     log.error(e.getMessage());
                 }
             }
@@ -143,7 +147,10 @@ public class BatchConfiguration {
             for (int i = 0; i < 10; i++) {
                 try {
                     wontedStatistic.crawlWebsite(front, i);
-                }  catch (IOException | InterruptedException | WebDriverException | ExecutionException e) {
+                }  catch (IOException | InterruptedException |
+                          WebDriverException | ExecutionException |
+                          CrawlingException e)
+                {
                     log.error(e.getMessage());
                 }
             }
@@ -170,7 +177,10 @@ public class BatchConfiguration {
             for (int i = 0; i < 10; i++) {
                 try {
                     wontedStatistic.crawlWebsite(fullStack, i);
-                } catch (IOException | InterruptedException | WebDriverException | ExecutionException e) {
+                } catch (IOException | InterruptedException |
+                         WebDriverException | ExecutionException |
+                         CrawlingException e)
+                {
                     log.error(e.getMessage());
                 }
             }

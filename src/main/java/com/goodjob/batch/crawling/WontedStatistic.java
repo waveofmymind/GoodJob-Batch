@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -136,7 +137,11 @@ public class WontedStatistic {
 
         System.out.println(checkDtos.size() + "개의 채용공고가 있습니다.");
         for (JobCheckDto checkDto : checkDtos) {
-            detailPage(checkDto);
+            try {
+                detailPage(checkDto);
+            } catch (CrawlingException e) {
+                continue;
+            }
         }
     }
 
@@ -175,33 +180,36 @@ public class WontedStatistic {
 
     @Async
     public void detailPage(JobCheckDto checkDto) throws ExecutionException, InterruptedException, IOException {
-        WebDriver driver = setDriver().get();
-        driver.get(checkDto.url());
+            WebDriver driver = setDriver().get();
+            driver.get(checkDto.url());
+
         try {
             scrollDown(driver);
+            WebDriverWait xpathWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement deadlineElement = xpathWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"__next\"]/div[3]/div[1]/div[1]/div/div[2]/section[2]/div[1]/span[2]")));
+            WebElement workingAreaElement = xpathWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"__next\"]/div[3]/div[1]/div[1]/div/div[2]/section[2]/div[2]/span[2]")));
+
+            // 웹 요소로부터 텍스트 추출
+            String deadLine = deadlineElement.getText();
+            String place = workingAreaElement.getText();
+            log.debug("{}", deadLine);
+            log.debug("{}", place);
+
+            JobResponseDto jobResponseDto = new JobResponseDto
+                    (
+                            checkDto.company(), checkDto.subject(), checkDto.url(),
+                            checkDto.sector(), checkDto.sectorCode(), checkDto.createDate(),
+                            deadLine, checkDto.career(), place
+                    );
+            System.out.println(jobResponseDto.getUrl());
+//        producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
         }catch (Exception e){
             e.printStackTrace();
-            driver.close();
             throw new CrawlingException("detailPage 스크롤 에러");
+        }finally {
+            driver.close();
         }
-        WebDriverWait xpathWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement deadlineElement = xpathWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"__next\"]/div[3]/div[1]/div[1]/div/div[2]/section[2]/div[1]/span[2]")));
-        WebElement workingAreaElement = xpathWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"__next\"]/div[3]/div[1]/div[1]/div/div[2]/section[2]/div[2]/span[2]")));
 
-        // 웹 요소로부터 텍스트 추출
-        String deadLine = deadlineElement.getText();
-        String place = workingAreaElement.getText();
-        log.debug("{}", deadLine);
-        log.debug("{}", place);
-
-        JobResponseDto jobResponseDto = new JobResponseDto
-                (
-                checkDto.company(), checkDto.subject(), checkDto.url(),
-                checkDto.sector(), checkDto.sectorCode(), checkDto.createDate(),
-                deadLine, checkDto.career(), place
-                );
-        producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
-        driver.close();
     }
 
 
