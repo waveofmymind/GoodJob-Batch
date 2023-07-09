@@ -1,7 +1,6 @@
 package com.goodjob.batch.batch;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goodjob.batch.api.SaraminApiManager;
 import com.goodjob.batch.crawling.WontedStatistic;
 import lombok.RequiredArgsConstructor;
@@ -37,10 +36,9 @@ import java.util.concurrent.ExecutorService;
 public class BatchConfiguration {
     private final PlatformTransactionManager transactionManager;
 
-    private final BatchProducer producer;
+    private final SaraminApiManager saraminApiManager;
 
-    private final ObjectMapper mapper;
-
+    private final WontedStatistic wontedStatistic;
     @Bean
     public TaskExecutor taskExecutor() {
         SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
@@ -91,7 +89,7 @@ public class BatchConfiguration {
             /**
              * @param sectorCode 백엔드 84, 프론트 92, 풀스택 2232
              */
-            SaraminApiManager saraminApiManager = new SaraminApiManager(producer, mapper);
+//            SaraminApiManager saraminApiManager = new SaraminApiManager(producer, mapper);
             saraminApiManager.saraminStatistic(84);
             saraminApiManager.saraminStatistic(92);
             saraminApiManager.saraminStatistic(2232);
@@ -114,13 +112,13 @@ public class BatchConfiguration {
     @StepScope
     public Tasklet taskletWontedBack() {
         return (contribution, chunkContext) -> {
-            WontedStatistic wontedStatistic = new WontedStatistic(producer, mapper);
+//            WontedStatistic wontedStatistic = new WontedStatistic(producer, mapper);
             int back = 872;
             for (int i = 0; i < 10; i++) {
                 try {
                     wontedStatistic.crawlWebsite(back, i);
-                }  catch (IOException | InterruptedException | WebDriverException | ExecutionException e) {
-                    log.error(e.getMessage());
+                } catch (IOException | InterruptedException | WebDriverException | ExecutionException e) {
+                    log.error(e.getMessage(), e);
                 }
             }
             return RepeatStatus.FINISHED;
@@ -139,12 +137,12 @@ public class BatchConfiguration {
     public Tasklet taskletWontedFront() {
         return (contribution, chunkContext) -> {
             int front = 669;
-            WontedStatistic wontedStatistic = new WontedStatistic(producer, mapper);
+//            WontedStatistic wontedStatistic = new WontedStatistic(producer, mapper);
             for (int i = 0; i < 10; i++) {
                 try {
                     wontedStatistic.crawlWebsite(front, i);
-                }  catch (IOException | InterruptedException | WebDriverException | ExecutionException e) {
-                    log.error(e.getMessage());
+                } catch (IOException | InterruptedException | WebDriverException | ExecutionException e) {
+                    log.error(e.getMessage(), e);
                 }
             }
             return RepeatStatus.FINISHED;
@@ -166,19 +164,17 @@ public class BatchConfiguration {
     public Tasklet taskletWontedFullStack() {
         return (contribution, chunkContext) -> {
             int fullStack = 873;
-            WontedStatistic wontedStatistic = new WontedStatistic(producer, mapper);
+//            WontedStatistic wontedStatistic = new WontedStatistic(producer, mapper);
             for (int i = 0; i < 10; i++) {
                 try {
                     wontedStatistic.crawlWebsite(fullStack, i);
                 } catch (IOException | InterruptedException | WebDriverException | ExecutionException e) {
-                    log.error(e.getMessage());
+                    log.error(e.getMessage(), e);
                 }
             }
             return RepeatStatus.FINISHED;
         };
     }
-
-
 
 
 //    @Bean

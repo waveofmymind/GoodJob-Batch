@@ -163,7 +163,7 @@ public class WontedStatistic {
     }
 
 
-    private void scrollDown(WebDriver driver) throws TimeoutException, NoSuchElementException{
+    private void scrollDown(WebDriver driver) throws TimeoutException, NoSuchElementException {
         WebElement element = driver.findElement(By.className("JobDescription_JobDescription__VWfcb"));
         WebDriverWait wait1 = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait1.until(ExpectedConditions.visibilityOfElementLocated(By.className("JobDescription_JobDescription__VWfcb")));
@@ -179,7 +179,7 @@ public class WontedStatistic {
         driver.get(checkDto.url());
         try {
             scrollDown(driver);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             driver.quit();
             throw new CrawlingException("detailPage 스크롤 에러");
@@ -196,9 +196,9 @@ public class WontedStatistic {
 
         JobResponseDto jobResponseDto = new JobResponseDto
                 (
-                checkDto.company(), checkDto.subject(), checkDto.url(),
-                checkDto.sector(), checkDto.sectorCode(), checkDto.createDate(),
-                deadLine, checkDto.career(), place
+                        checkDto.company(), checkDto.subject(), checkDto.url(),
+                        checkDto.sector(), checkDto.sectorCode(), checkDto.createDate(),
+                        deadLine, checkDto.career(), place
                 );
         producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
         driver.quit();

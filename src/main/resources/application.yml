@@ -55,7 +55,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "prometheus,health,info,metrics"
+        include: "prometheus,health,info,metrics,heapdump"
   metrics:
     tags:
       application: ${spring.application.name}
