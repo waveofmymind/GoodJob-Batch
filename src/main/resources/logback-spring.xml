@@ -26,7 +26,7 @@
 
     <springProfile name="default">
         <root level="INFO">
-            <appender-ref ref="console_log"/>
+            <appender-ref ref="aws_cloud_watch_log"/>
         </root>
     </springProfile>
 </configuration>
