@@ -94,6 +94,7 @@ public class SaraminApiManager {
             }
         } catch (NullPointerException e) {
             log.error("키 만료 or 주소 바뀜");
+
         } catch (JsonProcessingException e) {
             log.error("json 변환 실패");
         }
