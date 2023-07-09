@@ -200,7 +200,6 @@ public class WontedStatistic {
                 checkDto.sector(), checkDto.sectorCode(), checkDto.createDate(),
                 deadLine, checkDto.career(), place
                 );
-        System.out.println(jobResponseDto.getUrl());
         producer.batchProducer(objectMapper.writeValueAsString(jobResponseDto));
         driver.quit();
     }
